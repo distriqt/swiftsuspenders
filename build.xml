@@ -187,8 +187,8 @@
     <echo>[package] Release packaged successfully</echo>
   </target>
 
-    <!-- Construct AIR Package -->
-  <target name="airpackage" depends="test">
+  <!-- Construct AIR Package -->
+  <target name="airpackage_build" depends="test">
     <tstamp>
       <format property="touch.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
       <format property="published_date" pattern="yyyy-MM-dd" unit="hour"/>
@@ -237,12 +237,15 @@
     <delete dir="${airpackage.loc.tmp}"/>
     <echo>[package] Release packaged successfully</echo>
   </target>
-  <target name="airpackage_publish" depends="airpackage" >
+  <target name="airpackage" depends="airpackage_build">
     <property name="packagefile" value="swiftsuspenders_${swiftsuspenders.version.raw}.airpackage" />
     <echo message="[publish] deploying to ${github.repo} v${swiftsuspenders.version.raw} ${packagefile}" />
+    <exec executable="gh" failonerror="false">
+      <arg line="release create ${swiftsuspenders.version.raw} --title ${swiftsuspenders.version} --notes 'Release ${swiftsuspenders.version}'" />
+    </exec>
     <!-- Upload to github release -->
     <exec executable="gh" failonerror="true">
-      <arg line="-R ${github.repo} release upload ${swiftsuspenders.version}" />
+      <arg line="-R ${github.repo} release upload ${swiftsuspenders.version.raw}" />
       <arg line="${airpackage.loc}/${packagefile}" />
       <arg line="--clobber" />
     </exec>
